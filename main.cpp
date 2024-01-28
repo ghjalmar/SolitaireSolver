@@ -8,7 +8,8 @@
 #include "board.h"
 #include "solver.h"
 
-std::string PrintAvailableMoves(solitaire::AvailableMoves const& moves)
+template<typename Iterable>
+std::string PrintAvailableMoves(Iterable const& moves)
 {
     if (moves.empty()) return "";
 
@@ -26,33 +27,14 @@ std::string PrintAvailableMoves(solitaire::AvailableMoves const& moves)
     return printableMoves.erase(printableMoves.size()-1);
 }
 
-std::string PrintSolutionMoves(std::vector<solitaire::Move> const& moves)
-{
-    if (moves.empty()) return "";
-
-    std::string printableMoves{};
-    std::for_each(moves.cbegin(), moves.cend(),
-                  [&printableMoves](solitaire::Move move)
-                  {
-                      auto [row1, col1] = move.first;
-                      auto [row2, col2] = move.second;
-                      printableMoves.append(std::to_string(row1) + std::to_string(col1));
-                      printableMoves.append(", ");
-                      printableMoves.append(std::to_string(row2) + std::to_string(col2));
-                      printableMoves.append("\n");
-                  });
-    return printableMoves.erase(printableMoves.size()-1);
-}
-
 int main()
 {
-    std::cout << "Halló heimur!" << std::endl;
-    std::cout << "Upprunaleg staða á borði: " << std::endl;
+    std::cout << "Hello world!" << std::endl;
+    std::cout << "The game's starting position: " << std::endl;
     std::cout << solitaire::Board().getBoardState() << std::endl;
     std::cout << PrintAvailableMoves(solitaire::Board().getAvailableMoves()) << std::endl;
 
     // First solution
-    if (false)
     {
         auto const tick = std::chrono::system_clock::now();
         solitaire::Solution solution{};
@@ -62,8 +44,8 @@ int main()
         solution.push_back(firstMove);
         solitaire::SolveBoardOnce(bord, solution);
         auto const tock = std::chrono::system_clock::now();
-        std::cout << "Fyrsta lausn: \n" << PrintSolutionMoves(solution) << std::endl;
-        std::cout << "Lausnin fannst á " << (tock - tick).count() / (60e9) << " mínútum." << std::endl;
+        std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
+        std::cout << "Found the solution in  " << (tock - tick).count() / (60e9) << " minutes." << std::endl;
     }
 
     // Brute force all solutions
@@ -74,12 +56,12 @@ int main()
         auto const bord = solitaire::Board().applyMove(firstMove);
         auto const possibleMoves = bord.getAvailableMoves();
 
-        std::vector<std::jthread> solverThreads;
+        std::vector<std::thread> solverThreads;
         solverThreads.reserve(possibleMoves.size());
         std::vector<std::pair<solitaire::Solutions, solitaire::Board>> parallelSolutions{};
         parallelSolutions.reserve(possibleMoves.size());
 
-        std::cout << "Mogulegir leikir: " << possibleMoves.size() << std::endl;
+        std::cout << "Possible moves after having applied the first move: " << possibleMoves.size() << std::endl;
         for (auto const& move : possibleMoves)
         {
             auto const parallelBoard = bord.applyMove(move);
@@ -90,23 +72,21 @@ int main()
         for (auto& parallelSolution : parallelSolutions)
         {
             solverThreads.emplace_back(
-                    [&parallelSolution](std::stop_token) {
+                    [&parallelSolution]() {
                         solitaire::SolveBoard(std::get<solitaire::Board>(parallelSolution),
                                               std::get<solitaire::Solutions>(parallelSolution));
                     }
             );
-            std::cout << "Thradur i farinn af stað!" << std::endl;
         }
-//        std::cout << "Thraedir farnir af stad! Bid i 60 sek." << std::endl;
-//        std::this_thread::sleep_for(std::chrono::seconds{60});
+        std::cout << "Parallel threads launched." << std::endl;
         for (auto& thread : solverThreads)
         {
             thread.join();
         }
         auto const tock = std::chrono::system_clock::now();
-        std::cout << "Fyrsta lausnin: \n" << PrintSolutionMoves(std::get<solitaire::Solutions>(parallelSolutions.front()).front()) << std::endl;
-        std::cout << "Seinasta lausnin: \n" << PrintSolutionMoves(std::get<solitaire::Solutions>(parallelSolutions.back()).back()) << std::endl;
-        std::cout << "Lausnirnar fundust á " << (tock - tick).count() / (60e9) << " mínútum." << std::endl;
+        std::cout << "The first solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.front()).front()) << std::endl;
+        std::cout << "The last solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.back()).back()) << std::endl;
+        std::cout << "I took a total of  " << (tock - tick).count() / (60e9*60) << " hours to find all the solutions." << std::endl;
     }
     return 0;
 }

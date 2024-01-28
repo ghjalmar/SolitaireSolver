@@ -56,7 +56,7 @@ namespace solitaire
             }
             if (board.isSolved())
             {
-                std::cout << "Fann lausn!" << std::endl;
+                std::cout << "Found a solution!" << std::endl;
                 solutionFound = true;
             }
         }

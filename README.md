@@ -12,7 +12,6 @@ the subject of some scholar articles in the field of computer science [(Wikipedi
 
 
 TODO:
- - Make file for the `main` and `test` targets
- - Template the function for printing out a solution, templating it for an iterable type
- - Add thread workers and let the program run long enough to solve it
- - Add to GitHub and finish this README
+ - [x] Let the program run long enough to find all solutions
+ - [] Benchmark Apple M1 vs Intel
+ - [] Finish this README
