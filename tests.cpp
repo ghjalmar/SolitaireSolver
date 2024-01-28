@@ -4,6 +4,7 @@
 #include <string>
 
 #include "board.h"
+#include "solver.h"
 
 namespace test
 {
@@ -114,6 +115,37 @@ namespace test
         std::cout << "testApplyMove FAILED!" << std::endl;
         return EXIT_FAILURE;
     }
+
+    int testSolutions()
+    {
+        solitaire::Solutions solutions{};
+        for (int i{}; i < 32; ++i)
+        {
+            solutions.appendMove(solitaire::Move{{3, 1}, {3, 3}});
+        }
+        solutions.copyCurrentSolution();
+        solutions.popLastMove();
+        if (solutions.size() != 2)
+        {
+            std::cout << "testSolutions FAILED! solutions.size() != 2). " <<
+            "solutions.size() = " << solutions.size() << "." << std::endl;
+            return EXIT_FAILURE;
+        }
+        if (solutions.front().size() != 32)
+        {
+            std::cout << "testSolutions FAILED! solutions.front().size() != 32 " <<
+            "solutions.front().size() = " << solutions.front().size() << "." << std::endl;
+            return EXIT_FAILURE;
+        }
+        if (solutions.back().size() != 31)
+        {
+            std::cout << "testSolutions FAILED! solutions.back().size() != 31 " <<
+            "solutions.back().size() = " << solutions.back().size() << "." << std::endl;
+            return EXIT_FAILURE;
+        }
+        std::cout << "testSolutions PASSED!" << std::endl;
+        return EXIT_SUCCESS;
+    }
 }
 
 int main()
@@ -134,6 +166,9 @@ int main()
     ++totalTests;
 
     testStatus += test::testApplyMove();
+    ++totalTests;
+
+    testStatus += test::testSolutions();
     ++totalTests;
 
     auto tock = std::chrono::system_clock::now();

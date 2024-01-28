@@ -1,10 +1,10 @@
 all: solver test
 
 solver:
-	g++ ./main.cpp board.cpp square.cpp -o solitaireSolver
+	g++ --std=gnu++20 ./main.cpp board.cpp square.cpp  solver.cpp -o solitaireSolver
 
 test:
-	g++ ./tests.cpp board.cpp square.cpp -o solitaireTests
+	g++ --std=gnu++20 ./tests.cpp board.cpp square.cpp solver.cpp -o solitaireTests
 
 clean:
 	rm -rf ./solitaireSolver ./solitaireTests
