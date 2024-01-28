@@ -47,7 +47,7 @@ namespace solitaire
         {
             for (Col col{0}; col < BoardWidth; ++col)
             {
-                if (!this->at(row, col).isValidSquare()) continue;
+                if (!this->at(row, col).isValidSquare() || !this->at(row, col).isOccupied()) continue;
 
                 if (this->at(row-1, col).isValidSquare() && this->at(row-1, col).isOccupied())
                 {
