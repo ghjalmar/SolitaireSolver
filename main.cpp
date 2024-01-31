@@ -29,12 +29,11 @@ std::string PrintAvailableMoves(Iterable const& moves)
 
 int main()
 {
-    std::cout << "Hello world!" << std::endl;
     std::cout << "The game's starting position: " << std::endl;
     std::cout << solitaire::Board().getBoardState() << std::endl;
     std::cout << PrintAvailableMoves(solitaire::Board().getAvailableMoves()) << std::endl;
 
-    // First solution
+    // Find the first solution
     {
         auto const tick = std::chrono::system_clock::now();
         solitaire::Solution solution{};
@@ -45,10 +44,10 @@ int main()
         solitaire::SolveBoardOnce(bord, solution);
         auto const tock = std::chrono::system_clock::now();
         std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
-        std::cout << "Found the solution in  " << (tock - tick).count() / (60e9) << " minutes." << std::endl;
+        std::cout << "Found the solution in  " << (tock - tick).count() / (1e6) << " seconds." << std::endl;
     }
 
-    // Brute force all solutions
+    // Brute force to find all solutions
     {
         auto const tick = std::chrono::system_clock::now();
         auto const firstMove{solitaire::Move{{1, 3},
@@ -86,7 +85,7 @@ int main()
         auto const tock = std::chrono::system_clock::now();
         std::cout << "The first solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.front()).front()) << std::endl;
         std::cout << "The last solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.back()).back()) << std::endl;
-        std::cout << "I took a total of  " << (tock - tick).count() / (60e9*60) << " hours to find all the solutions." << std::endl;
+        std::cout << "I took a total of  " << (tock - tick).count() / (60e6*60) << " hours to find all the solutions." << std::endl;
     }
     return 0;
 }

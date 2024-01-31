@@ -80,22 +80,12 @@ namespace solitaire
 
     void SolveBoard(solitaire::Board board, Solutions& solutions)
     {
-//        static std::uint32_t iter;
-//        static std::uint64_t millions;
         auto const availableMoves = board.getAvailableMoves();
 
-        if (availableMoves.empty())
+        if (availableMoves.empty() && board.isSolved())
         {
-//            iter = (++iter % 1'000'000);
-//            if (iter == 0)
-//            {
-//                std::cout << ++millions << " million iterations." << std::endl;
-//            }
-            if (board.isSolved())
-            {
-                std::cout << "Fann lausn nr. " << solutions.size() << "." << std::endl;
-                solutions.copyCurrentSolution();
-            }
+            std::cout << "Found solution nbr. " << solutions.size() << "." << std::endl;
+            solutions.copyCurrentSolution();
         }
 
         for (auto const& move : availableMoves)

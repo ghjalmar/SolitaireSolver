@@ -7,15 +7,15 @@ namespace solitaire
 {
     Board::Board() noexcept
     {
-        auto shortRow = BoardRow{Square{SquareOccupation::invalid}, Square{SquareOccupation::invalid},
+        auto const shortRow = BoardRow{Square{SquareOccupation::invalid}, Square{SquareOccupation::invalid},
                                  Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                  Square{SquareOccupation::occupied}, Square{SquareOccupation::invalid},
                                  Square{SquareOccupation::invalid}};
-        auto fullRow = BoardRow{Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
+        auto const fullRow = BoardRow{Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                 Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                 Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                 Square{SquareOccupation::occupied}};
-        auto middleRow = BoardRow{Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
+        auto const middleRow = BoardRow{Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                   Square{SquareOccupation::occupied}, Square{SquareOccupation::empty},
                                   Square{SquareOccupation::occupied}, Square{SquareOccupation::occupied},
                                   Square{SquareOccupation::occupied}};
