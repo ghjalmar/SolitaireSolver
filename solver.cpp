@@ -26,7 +26,7 @@ namespace solitaire
         solutions_.back().reserve(32);
     }
 
-    std::size_t Solutions::size()
+    std::size_t Solutions::size() const
     {
         return solutions_.size();
     }

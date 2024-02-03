@@ -83,6 +83,13 @@ int main()
             thread.join();
         }
         auto const tock = std::chrono::system_clock::now();
+        int totalSolutions{};
+        std::for_each(parallelSolutions.cbegin(), parallelSolutions.cend(),
+                      [&totalSolutions](auto const solutionsSubset)
+                      {
+                        totalSolutions += std::get<solitaire::Solutions>(solutionsSubset).size();
+                      });
+        std::cout << "Finished search for solutions. Found a total of " << totalSolutions << " solutions." << std::endl;
         std::cout << "The first solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.front()).front()) << std::endl;
         std::cout << "The last solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.back()).back()) << std::endl;
         std::cout << "I took a total of  " << (tock - tick).count() / (60e6*60) << " hours to find all the solutions." << std::endl;

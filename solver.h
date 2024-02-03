@@ -20,7 +20,7 @@ namespace solitaire
         void popLastMove();
         Solution back();
         Solution front();
-        std::size_t size();
+        std::size_t size() const;
 
     private:
         std::vector<Solution> solutions_;
