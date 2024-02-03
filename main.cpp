@@ -1,11 +1,12 @@
-#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <memory>
+#include <numeric>
 
 #include "board.h"
+#include "common.h"
 #include "solver.h"
 
 template<typename Iterable>
@@ -44,7 +45,7 @@ int main()
         solitaire::SolveBoardOnce(bord, solution);
         auto const tock = std::chrono::system_clock::now();
         std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
-        std::cout << "Found the solution in  " << std::chrono::milliseconds{(tock - tick).count()}.count() / (1e3) << " seconds." << std::endl;
+        std::cout << "Found the solution in  " << common::TimeDiffAsUs(tock, tick)/1e6 << " seconds." << std::endl;
     }
 
     // Brute force to find all solutions
@@ -71,7 +72,8 @@ int main()
         for (auto& parallelSolution : parallelSolutions)
         {
             solverThreads.emplace_back(
-                    [&parallelSolution]() {
+                    [&parallelSolution]()
+                    {
                         solitaire::SolveBoard(std::get<solitaire::Board>(parallelSolution),
                                               std::get<solitaire::Solutions>(parallelSolution));
                     }
@@ -83,16 +85,15 @@ int main()
             thread.join();
         }
         auto const tock = std::chrono::system_clock::now();
-        int totalSolutions{};
-        std::for_each(parallelSolutions.cbegin(), parallelSolutions.cend(),
-                      [&totalSolutions](auto const solutionsSubset)
+        std::size_t totalSolutions = std::accumulate(parallelSolutions.cbegin(), parallelSolutions.cend(), 0,
+                      [](std::size_t sum, auto const solutionsSubset)
                       {
-                        totalSolutions += std::get<solitaire::Solutions>(solutionsSubset).size();
+                        return sum + std::get<solitaire::Solutions>(solutionsSubset).size();
                       });
         std::cout << "Finished search for solutions. Found a total of " << totalSolutions << " solutions." << std::endl;
         std::cout << "The first solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.front()).front()) << std::endl;
         std::cout << "The last solution: \n" << PrintAvailableMoves(std::get<solitaire::Solutions>(parallelSolutions.back()).back()) << std::endl;
-        std::cout << "I took a total of  " << (tock - tick).count() / (60e6*60) << " hours to find all the solutions." << std::endl;
+        std::cout << "I took a total of  " << common::TimeDiffAsUs(tock, tick)/(60.0*1e6) << " hours to find all the solutions." << std::endl;
     }
     return 0;
 }

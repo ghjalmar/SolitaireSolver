@@ -4,6 +4,7 @@
 #include <string>
 
 #include "board.h"
+#include "common.h"
 #include "solver.h"
 
 namespace test
@@ -173,7 +174,7 @@ int main()
 
     auto tock = std::chrono::system_clock::now();
     std::cout << "\nRan a total of " << totalTests <<" test(s) in " <<
-        std::chrono::milliseconds{(tock - tick).count()}.count() / (1e3) << " milliseconds." << std::endl;
+      common::TimeDiffAsUs(tock, tick)/1000 << " milliseconds." << std::endl;
     if (!testStatus)
     {
         std::cout << "All tests PASSED!" << std::endl;
