@@ -44,7 +44,7 @@ int main()
         solitaire::SolveBoardOnce(bord, solution);
         auto const tock = std::chrono::system_clock::now();
         std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
-        std::cout << "Found the solution in  " << (tock - tick).count() / (1e6) << " seconds." << std::endl;
+        std::cout << "Found the solution in  " << std::chrono::milliseconds{(tock - tick).count()}.count() / (1e3) << " seconds." << std::endl;
     }
 
     // Brute force to find all solutions

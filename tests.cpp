@@ -173,7 +173,7 @@ int main()
 
     auto tock = std::chrono::system_clock::now();
     std::cout << "\nRan a total of " << totalTests <<" test(s) in " <<
-        (tock-tick).count()/1e3 << " milliseconds." << std::endl;
+        std::chrono::milliseconds{(tock - tick).count()}.count() / (1e3) << " milliseconds." << std::endl;
     if (!testStatus)
     {
         std::cout << "All tests PASSED!" << std::endl;
