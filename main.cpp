@@ -16,10 +16,10 @@ std::string PrintAvailableMoves(Iterable const& moves)
 
     std::string printableMoves{};
     std::for_each(moves.cbegin(), moves.cend(),
-                  [&printableMoves](solitaire::Move move)
+                  [&printableMoves](solitaire::Move const& move)
                     {
-                        auto [row1, col1] = move.first;
-                        auto [row2, col2] = move.second;
+                        auto const& [row1, col1] = move.first;
+                        auto const& [row2, col2] = move.second;
                         printableMoves.append(std::to_string(row1) + std::to_string(col1));
                         printableMoves.append(", ");
                         printableMoves.append(std::to_string(row2) + std::to_string(col2));
