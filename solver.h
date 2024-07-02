@@ -28,6 +28,7 @@ namespace solitaire
 
     bool SolveBoardOnce(solitaire::Board board, Solution& solution);
     void SolveBoard(solitaire::Board board, Solutions& solutions);
+    bool SolveBoardRandomly(solitaire::Board board, Solution& solution);
 }
 
 #endif //SOLITAIREHACK_SOLVER_H

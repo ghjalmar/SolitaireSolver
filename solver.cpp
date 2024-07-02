@@ -1,6 +1,12 @@
 #include <iostream>
+#include <iterator>
+#include <random>
+#include <unordered_set>
 
 #include "solver.h"
+
+
+#include <iostream>
 
 namespace solitaire
 {
@@ -66,6 +72,67 @@ namespace solitaire
             auto const boardIteration = board.applyMove(move);
             solution.push_back(move);
             if (!SolveBoardOnce(boardIteration, solution))
+            {
+                solution.pop_back();
+            }
+            else
+            {
+                solutionFound = true;
+                break;
+            }
+        }
+        return solutionFound;
+    }
+
+    class RandomMovePicker
+    {
+    public:
+        RandomMovePicker(solitaire::AvailableMoves const originalAvailableMoves) : randomGeneratingEngine_{randomDevice_()}, randomGenerator_{0, static_cast<int>(originalAvailableMoves.size() - 1)}, remainingMoves_{originalAvailableMoves}
+        {}
+
+        solitaire::Move randomMove()
+        {
+            if (remainingMoves_.empty()) return Move{};
+
+            auto it = remainingMoves_.begin();
+            std::advance(it, randomGenerator_(randomGeneratingEngine_));
+            Move moveToPlay{*it};
+            remainingMoves_.erase(it);
+            randomGenerator_ = std::uniform_int_distribution<int>{0, static_cast<int>(remainingMoves() - 1)};
+            return moveToPlay;
+        }
+
+
+        std::size_t remainingMoves() const
+        {
+            return remainingMoves_.size();
+        }
+
+    private:
+        std::random_device randomDevice_{};
+        std::mt19937 randomGeneratingEngine_;
+        solitaire::AvailableMoves remainingMoves_;
+        std::uniform_int_distribution<int> randomGenerator_;
+    };
+
+    bool SolveBoardRandomly(solitaire::Board board, Solution& solution)
+    {
+        bool solutionFound{false};
+        auto const availableMoves = board.getAvailableMoves();
+
+        if (availableMoves.empty() && board.isSolved())
+        {
+            return true;
+        }
+
+        RandomMovePicker randomMovePicker{availableMoves};
+        while(randomMovePicker.remainingMoves() != 0)
+        {
+            auto const move = randomMovePicker.randomMove();
+            // std::cout << "retrieved a random move from random move picker" << std::endl;
+            auto const boardIteration = board.applyMove(move);
+            solution.push_back(move);
+            if (!SolveBoardRandomly(boardIteration, solution))
             {
                 solution.pop_back();
             }

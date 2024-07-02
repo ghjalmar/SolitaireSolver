@@ -34,17 +34,35 @@ int main()
     std::cout << solitaire::Board().getBoardState() << std::endl;
     std::cout << PrintAvailableMoves(solitaire::Board().getAvailableMoves()) << std::endl;
 
-    // Find the first solution
+    // // Find the first solution
+    // {
+    //     auto const tick = std::chrono::system_clock::now();
+    //     solitaire::Solution solution{};
+    //     auto const firstMove{solitaire::Move{{1, 3},
+    //                                          {3, 3}}};
+    //     auto const board = solitaire::Board().applyMove(firstMove);
+    //     solution.push_back(firstMove);
+    //     solitaire::SolveBoardOnce(board, solution);
+    //     auto const tock = std::chrono::system_clock::now();
+    //     std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
+    //     std::cout << "Found the solution in  " << common::TimeDiffAsUs(tock, tick)/1e6 << " seconds." << std::endl;
+    // }
+
+    // Find a random solution
     {
         auto const tick = std::chrono::system_clock::now();
         solitaire::Solution solution{};
-        auto const firstMove{solitaire::Move{{1, 3},
-                                             {3, 3}}};
-        auto const bord = solitaire::Board().applyMove(firstMove);
-        solution.push_back(firstMove);
-        solitaire::SolveBoardOnce(bord, solution);
+        bool solutionFound{false};
+        // while (!solutionFound)
+        // {
+        //     std::cout << "Starting a new random solutio iteration" << std::endl;
+        //     solitaire::Solution solution{};
+        solutionFound = solitaire::SolveBoardRandomly(solitaire::Board{}, solution);
+            // completeSolution = completeSolution;
+            // std::cout << "Ended the new random solution iteration" << std::endl;
+        // }
         auto const tock = std::chrono::system_clock::now();
-        std::cout << "The first solution found: \n" << PrintAvailableMoves(solution) << std::endl;
+        std::cout << "A (random) solution found: \n" << PrintAvailableMoves(solution) << std::endl;
         std::cout << "Found the solution in  " << common::TimeDiffAsUs(tock, tick)/1e6 << " seconds." << std::endl;
     }
 
@@ -53,8 +71,8 @@ int main()
         auto const tick = std::chrono::system_clock::now();
         auto const firstMove{solitaire::Move{{1, 3},
                                              {3, 3}}};
-        auto const bord = solitaire::Board().applyMove(firstMove);
-        auto const possibleMoves = bord.getAvailableMoves();
+        auto const board = solitaire::Board().applyMove(firstMove);
+        auto const possibleMoves = board.getAvailableMoves();
 
         std::vector<std::thread> solverThreads;
         solverThreads.reserve(possibleMoves.size());
@@ -64,7 +82,7 @@ int main()
         std::cout << "Possible moves after having applied the first move: " << possibleMoves.size() << std::endl;
         for (auto const& move : possibleMoves)
         {
-            auto const parallelBoard = bord.applyMove(move);
+            auto const parallelBoard = board.applyMove(move);
             parallelSolutions.push_back(std::pair{solitaire::Solutions{}, parallelBoard});
             std::get<solitaire::Solutions>(parallelSolutions.back()).appendMove(firstMove);
             std::get<solitaire::Solutions>(parallelSolutions.back()).appendMove(move);
