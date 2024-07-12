@@ -15,10 +15,12 @@ namespace solitaire
         Solutions();
         ~Solutions() = default;
 
-        void appendMove(Move move);
+        void appendSolution(Solution const &solution);
+        void appendMove(Move const &move);
         void copyCurrentSolution();
         void popLastMove();
         Solution back();
+        bool contains(Solution const &solution) const;
         Solution front();
         std::size_t size() const;
 
@@ -26,9 +28,12 @@ namespace solitaire
         std::vector<Solution> solutions_;
     };
 
-    bool SolveBoardOnce(solitaire::Board board, Solution& solution);
-    void SolveBoard(solitaire::Board board, Solutions& solutions);
-    bool SolveBoardRandomly(solitaire::Board board, Solution& solution);
+    bool SolveBoardOnce(solitaire::Board board, Solution &solution);
+
+    void SolveBoard(solitaire::Board board, Solutions &solutions);
+
+    bool SolveBoardRandomly(solitaire::Board board, Solution &solution, std::uint32_t &randomSelectionsMade,
+                            std::uint32_t const &maxRandomSelections);
 }
 
 #endif //SOLITAIREHACK_SOLVER_H

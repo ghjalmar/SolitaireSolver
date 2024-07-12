@@ -1,24 +1,37 @@
 #include <iostream>
 #include <iterator>
-#include <random>
 #include <unordered_set>
 
 #include "solver.h"
-
+#include "random_picks.h"
 
 #include <iostream>
 
 namespace solitaire
 {
-    Solutions::Solutions() : solutions_{1, Solution{}}
+    Solutions::Solutions() : solutions_{}
     {
         solutions_.reserve(100'000);
-        solutions_.back().reserve(32);
     }
 
-    void Solutions::appendMove(Move move)
+    void Solutions::appendSolution(solitaire::Solution const& solution)
     {
+        solutions_.push_back(solution);
+    }
+
+    void Solutions::appendMove(Move const& move)
+    {
+        if (solutions_.empty())
+        {
+            solutions_.emplace_back();
+            solutions_.back().reserve(32);
+        }
         solutions_.back().push_back(move);
+    }
+
+    bool Solutions::contains(Solution const& solution) const
+    {
+        return std::find(solutions_.begin(), solutions_.end(), solution) != solutions_.end();
     }
 
     void Solutions::popLastMove()
@@ -84,55 +97,40 @@ namespace solitaire
         return solutionFound;
     }
 
-    class RandomMovePicker
+    bool SolveBoardRandomly(solitaire::Board board, Solution &solution, std::uint32_t& randomSelectionsMade, std::uint32_t const& maxRandomSelections)
     {
-    public:
-        RandomMovePicker(solitaire::AvailableMoves const originalAvailableMoves) : randomGeneratingEngine_{randomDevice_()}, randomGenerator_{0, static_cast<int>(originalAvailableMoves.size() - 1)}, remainingMoves_{originalAvailableMoves}
-        {}
+        static std::uint32_t iter{0};
 
-        solitaire::Move randomMove()
-        {
-            if (remainingMoves_.empty()) return Move{};
-
-            auto it = remainingMoves_.begin();
-            std::advance(it, randomGenerator_(randomGeneratingEngine_));
-            Move moveToPlay{*it};
-            remainingMoves_.erase(it);
-            randomGenerator_ = std::uniform_int_distribution<int>{0, static_cast<int>(remainingMoves() - 1)};
-            return moveToPlay;
-        }
-
-
-        std::size_t remainingMoves() const
-        {
-            return remainingMoves_.size();
-        }
-
-    private:
-        std::random_device randomDevice_{};
-        std::mt19937 randomGeneratingEngine_;
-        solitaire::AvailableMoves remainingMoves_;
-        std::uniform_int_distribution<int> randomGenerator_;
-    };
-
-    bool SolveBoardRandomly(solitaire::Board board, Solution& solution)
-    {
+        static RandomIntBetweenAAndB randomIntBetween1And100{1, 100};
         bool solutionFound{false};
-        auto const availableMoves = board.getAvailableMoves();
+        auto availableMoves = board.getAvailableMoves();
 
-        if (availableMoves.empty() && board.isSolved())
+        if (availableMoves.empty())
         {
-            return true;
+            ++iter;
+            if ((iter % 1'000'000) == 0)
+            {
+                std::cout << iter/1'000'000 << " million iterations." << std::endl;
+            }
+            if (board.isSolved())
+            {
+                return true;
+            }
+            return false;
         }
 
-        RandomMovePicker randomMovePicker{availableMoves};
-        while(randomMovePicker.remainingMoves() != 0)
+        if (availableMoves.size() > 1 && solution.size() < 16 && randomSelectionsMade < maxRandomSelections)
         {
-            auto const move = randomMovePicker.randomMove();
-            // std::cout << "retrieved a random move from random move picker" << std::endl;
+            RandomMovePicker randomMovePicker{availableMoves};
+            ++randomSelectionsMade;
+            std::cout << "Choosing a random move for the " << std::to_string(randomSelectionsMade) << " time." << std::endl;
+            availableMoves = randomMovePicker.pickRandomMoves();
+        }
+        for (auto const& move : availableMoves)
+        {
             auto const boardIteration = board.applyMove(move);
             solution.push_back(move);
-            if (!SolveBoardRandomly(boardIteration, solution))
+            if (!SolveBoardRandomly(boardIteration, solution, randomSelectionsMade, maxRandomSelections))
             {
                 solution.pop_back();
             }

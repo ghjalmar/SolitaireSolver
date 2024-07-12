@@ -12,7 +12,6 @@ the subject of some scholar articles in the field of computer science [(Wikipedi
 
 
 TODO:
- - [x] Let the program run long enough to find all solutions
  - [ ] Benchmark Apple M1 vs Intel
  - [ ] Finish this README
  - [ ] Move source file to src directory
