@@ -36,7 +36,7 @@ namespace solitaire
     {
         solitaire::AvailableMoves randomMoves{};
         auto movesToPick = RandomIntBetweenAAndB(1, static_cast<int>(remainingMoves()))();
-        std::cout << "Picking " << movesToPick << " random moves." << std::endl;
+        std::cout << "Picking " << movesToPick << " random move(s)." << std::endl;
         for (int i = 0; i < movesToPick; ++i)
         {
             randomMoves.insert(randomMove());

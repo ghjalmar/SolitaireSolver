@@ -123,7 +123,7 @@ namespace solitaire
         {
             RandomMovePicker randomMovePicker{availableMoves};
             ++randomSelectionsMade;
-            std::cout << "Choosing a random move for the " << std::to_string(randomSelectionsMade) << " time." << std::endl;
+            std::cout << "Choosing random move(s) for the " << std::to_string(randomSelectionsMade) << " time." << std::endl;
             availableMoves = randomMovePicker.pickRandomMoves();
         }
         for (auto const& move : availableMoves)
