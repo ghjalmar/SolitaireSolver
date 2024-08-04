@@ -1,18 +1,37 @@
 #include <iostream>
+#include <iterator>
+#include <unordered_set>
 
 #include "solver.h"
+#include "random_picks.h"
+
+#include <iostream>
 
 namespace solitaire
 {
-    Solutions::Solutions() : solutions_{1, Solution{}}
+    Solutions::Solutions() : solutions_{}
     {
         solutions_.reserve(100'000);
-        solutions_.back().reserve(32);
     }
 
-    void Solutions::appendMove(Move move)
+    void Solutions::appendSolution(solitaire::Solution const& solution)
     {
+        solutions_.push_back(solution);
+    }
+
+    void Solutions::appendMove(Move const& move)
+    {
+        if (solutions_.empty())
+        {
+            solutions_.emplace_back();
+            solutions_.back().reserve(32);
+        }
         solutions_.back().push_back(move);
+    }
+
+    bool Solutions::contains(Solution const& solution) const
+    {
+        return std::find(solutions_.begin(), solutions_.end(), solution) != solutions_.end();
     }
 
     void Solutions::popLastMove()
@@ -66,6 +85,52 @@ namespace solitaire
             auto const boardIteration = board.applyMove(move);
             solution.push_back(move);
             if (!SolveBoardOnce(boardIteration, solution))
+            {
+                solution.pop_back();
+            }
+            else
+            {
+                solutionFound = true;
+                break;
+            }
+        }
+        return solutionFound;
+    }
+
+    bool SolveBoardRandomly(solitaire::Board board, Solution &solution, std::uint32_t& randomSelectionsMade, std::uint32_t const& maxRandomSelections)
+    {
+        static std::uint32_t iter{0};
+
+        static RandomIntBetweenAAndB randomIntBetween1And100{1, 100};
+        bool solutionFound{false};
+        auto availableMoves = board.getAvailableMoves();
+
+        if (availableMoves.empty())
+        {
+            ++iter;
+            if ((iter % 1'000'000) == 0)
+            {
+                std::cout << iter/1'000'000 << " million iterations." << std::endl;
+            }
+            if (board.isSolved())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        if (availableMoves.size() > 1 && solution.size() < 16 && randomSelectionsMade < maxRandomSelections)
+        {
+            RandomMovePicker randomMovePicker{availableMoves};
+            ++randomSelectionsMade;
+            std::cout << "Choosing random move(s) for the " << std::to_string(randomSelectionsMade) << " time." << std::endl;
+            availableMoves = randomMovePicker.pickRandomMoves();
+        }
+        for (auto const& move : availableMoves)
+        {
+            auto const boardIteration = board.applyMove(move);
+            solution.push_back(move);
+            if (!SolveBoardRandomly(boardIteration, solution, randomSelectionsMade, maxRandomSelections))
             {
                 solution.pop_back();
             }
